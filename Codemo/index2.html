@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infographic: Lộ Trình Phát Triển Kỹ Năng Kiến Trúc</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Energetic & Playful -->
+    <!-- Narrative Plan: Infographic được cấu trúc như một hành trình tuyến tính, chia thành bốn giai đoạn chính tương ứng với báo cáo: 1. Nền tảng Vẽ tay, 2. Bộ công cụ Số (kết hợp giai đoạn 2&3 của báo cáo), 3. Lộ trình Sự nghiệp, và 4. Tổng kết. Luồng tường thuật này dẫn dắt người dùng từ điểm khởi đầu (kỹ năng cơ bản) đến các kỹ năng nâng cao và cuối cùng là con đường sự nghiệp, tạo ra một câu chuyện phát triển liền mạch. Cách tiếp cận này giúp đơn giản hóa thông tin phức tạp và làm cho nó dễ tiếp cận hơn cho đối tượng mục tiêu là sinh viên và kiến trúc sư trẻ. -->
+    <!-- Visualization & Content Choices: 
+        - GĐ 1 (Vẽ tay): Dùng biểu đồ thanh ngang (Chart.js) để so sánh thời gian học các kỹ năng vẽ. Goal: Compare. Justification: Trực quan hóa sự đầu tư thời gian cho từng kỹ năng nền tảng.
+        - GĐ 2 (Công cụ số): Dùng sơ đồ luồng công việc (HTML/CSS) để thể hiện sự tích hợp giữa các phần mềm. Goal: Organize. Justification: Hiển thị mối quan hệ và quy trình làm việc thay vì chỉ liệt kê công cụ. Các thẻ thông tin (HTML/CSS) để so sánh các phần mềm. Goal: Compare.
+        - GĐ 3 (Sự nghiệp): Dùng dòng thời gian dọc (HTML/CSS) để minh họa các nấc thang sự nghiệp. Goal: Change. Justification: Thể hiện sự tiến triển theo thời gian một cách hấp dẫn. Biểu đồ thanh đứng (Chart.js) để so sánh số năm kinh nghiệm yêu cầu. Goal: Compare.
+        - Số liệu nổi bật: Dùng các thẻ số lớn (HTML/CSS) để nhấn mạnh các thông tin quan trọng như "5+ Năm để có giấy phép". Goal: Inform.
+        Tất cả các lựa chọn này đều tuân thủ nghiêm ngặt yêu cầu không sử dụng SVG và Mermaid JS. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .text-shadow {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background-color: #FFD166;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: 0;
+            top: 4px;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            border: 4px solid #f8f9fa;
+            background: #118AB2;
+        }
+        .chart-container { 
+            position: relative; 
+            width: 100%; 
+            max-width: 600px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 300px; 
+            max-height: 400px; 
+        }
+        @media (min-width: 768px) { 
+            .chart-container { 
+                height: 350px; 
+            } 
+        }
+        .flow-arrow {
+            font-size: 2rem;
+            color: #118AB2;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <header class="text-center py-12">
+            <h1 class="text-5xl md:text-7xl font-extrabold text-[#073B4C] text-shadow">Lộ Trình Phát Triển Kỹ Năng Kiến Trúc</h1>
+            <p class="mt-4 text-lg md:text-xl text-[#118AB2] max-w-3xl mx-auto">Một hành trình đa diện kết hợp giữa <span class="font-bold text-[#FF6B6B]">Nghệ Thuật Truyền Thống</span> và <span class="font-bold text-[#06D6A0]">Công Cụ Kỹ Thuật Số</span></p>
+        </header>
+
+        <main class="space-y-16">
+            <section id="stage1">
+                <h2 class="text-3xl font-bold text-center mb-8"><span class="text-[#FF6B6B]">Giai Đoạn 1:</span> Xây Dựng Nền Tảng Vẽ Tay</h2>
+                <p class="text-center max-w-3xl mx-auto mb-12">Đây là bước khởi đầu quan trọng nhất, nơi bạn rèn luyện tư duy thị giác, thẩm mỹ và khả năng phân tích không gian ba chiều. Nắm vững kỹ năng vẽ tay là chìa khóa để "suy nghĩ bằng hình ảnh".</p>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-8 items-center">
+                    <div class="md:col-span-3 card p-6">
+                        <h3 class="font-bold text-xl mb-4 text-[#118AB2]">Thời Gian Học Vẽ Hình Họa Chì (Ước Tính)</h3>
+                        <p class="mb-4 text-sm">Biểu đồ thể hiện thời gian cần thiết để nắm vững từng kỹ năng cốt lõi, chuẩn bị cho các kỳ thi tuyển sinh và công việc sau này.</p>
+                        <div class="chart-container h-80">
+                            <canvas id="drawingChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="md:col-span-2 space-y-4">
+                        <div class="card p-5">
+                            <h4 class="font-bold text-lg">✍️ Phác Thảo (Sketching)</h4>
+                            <p class="text-sm mt-1">Ngôn ngữ trực quan để nhanh chóng ghi lại, phát triển và truyền đạt ý tưởng thiết kế.</p>
+                        </div>
+                        <div class="card p-5">
+                            <h4 class="font-bold text-lg">🎨 Tư Duy Thẩm Mỹ</h4>
+                            <p class="text-sm mt-1">Yếu tố cốt lõi tạo ra những công trình độc đáo, được rèn luyện qua thực hành và nghiên cứu.</p>
+                        </div>
+                        <div class="card p-5">
+                            <h4 class="font-bold text-lg">💡 Sơ Đồ & Minh Họa</h4>
+                            <p class="text-sm mt-1">Công cụ mạnh mẽ để giải thích các quy trình phức tạp và kể câu chuyện về thiết kế.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="stage2-3">
+                <h2 class="text-3xl font-bold text-center mb-8"><span class="text-[#06D6A0]">Giai Đoạn 2:</span> Làm Chủ Bộ Công Cụ Số</h2>
+                <p class="text-center max-w-3xl mx-auto mb-12">Từ bản vẽ 2D chính xác đến các mô hình 3D sống động, việc thành thạo phần mềm là yêu cầu bắt buộc. Các công cụ này không hoạt động độc lập mà tương tác trong một hệ sinh thái thiết kế tích hợp.</p>
+                
+                <div class="card p-8 md:col-span-2 mb-12">
+                    <h3 class="text-2xl font-bold text-center mb-6 text-[#118AB2]">Quy Trình Làm Việc (Workflow) Diễn Họa Tiêu Biểu</h3>
+                    <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center">
+                        <div class="flex flex-col items-center">
+                            <div class="p-4 bg-gray-100 rounded-lg shadow">
+                                <span class="text-2xl">🏠</span>
+                                <p class="font-semibold mt-1">SketchUp/Revit</p>
+                                <p class="text-xs">Dựng mô hình 3D</p>
+                            </div>
+                        </div>
+                        <div class="flow-arrow transform md:-translate-y-2 rotate-90 md:rotate-0">→</div>
+                        <div class="flex flex-col items-center">
+                            <div class="p-4 bg-gray-100 rounded-lg shadow">
+                                <span class="text-2xl">🎲</span>
+                                <p class="font-semibold mt-1">3ds Max</p>
+                                <p class="text-xs">Tinh chỉnh chi tiết</p>
+                            </div>
+                        </div>
+                        <div class="flow-arrow transform md:-translate-y-2 rotate-90 md:rotate-0">→</div>
+                         <div class="flex flex-col items-center">
+                            <div class="p-4 bg-gray-100 rounded-lg shadow">
+                                <span class="text-2xl">💡</span>
+                                <p class="font-semibold mt-1">V-Ray/Corona/Lumion</p>
+                                <p class="text-xs">Render hình ảnh</p>
+                            </div>
+                        </div>
+                        <div class="flow-arrow transform md:-translate-y-2 rotate-90 md:rotate-0">→</div>
+                        <div class="flex flex-col items-center">
+                           <div class="p-4 bg-gray-100 rounded-lg shadow">
+                                <span class="text-2xl">🖌️</span>
+                                <p class="font-semibold mt-1">Photoshop</p>
+                                <p class="text-xs">Hậu kỳ & Hoàn thiện</p>
+                           </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                     <div class="card p-5">
+                        <h4 class="font-bold text-lg">📐 AutoCAD</h4>
+                        <p class="text-sm mt-1">Nền tảng cho bản vẽ kỹ thuật 2D, triển khai thi công chính xác.</p>
+                    </div>
+                     <div class="card p-5">
+                        <h4 class="font-bold text-lg">🏗️ Revit (BIM)</h4>
+                        <p class="text-sm mt-1">Mô hình hóa thông tin công trình, trung tâm của quy trình làm việc cộng tác.</p>
+                    </div>
+                     <div class="card p-5">
+                        <h4 class="font-bold text-lg">💡 V-Ray/Corona</h4>
+                        <p class="text-sm mt-1">"Vua" render tĩnh, tạo ra những hình ảnh chân thực và chất lượng nghệ thuật cao.</p>
+                    </div>
+                     <div class="card p-5">
+                        <h4 class="font-bold text-lg">🎬 Lumion</h4>
+                        <p class="text-sm mt-1">Render video và hình ảnh nhanh chóng, tối ưu cho việc trình bày và tiếp thị.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="stage4">
+                 <h2 class="text-3xl font-bold text-center mb-8"><span class="text-[#FFD166]">Giai Đoạn 3:</span> Thăng Tiến Sự Nghiệp</h2>
+                 <p class="text-center max-w-3xl mx-auto mb-12">Kỹ năng cứng là nền tảng, nhưng để tiến xa, bạn cần tích lũy kinh nghiệm, đạt được chứng chỉ hành nghề và trau dồi kỹ năng mềm như lãnh đạo và quản lý.</p>
+                 <div class="grid grid-cols-1 md:grid-cols-5 gap-12">
+                    <div class="md:col-span-2">
+                        <div class="card p-6">
+                             <h3 class="font-bold text-xl mb-4 text-[#118AB2]">Kinh Nghiệm Yêu Cầu Theo Vị Trí</h3>
+                             <p class="mb-4 text-sm">Số năm kinh nghiệm là một yếu tố then chốt để thăng tiến lên các vị trí quản lý và lãnh đạo.</p>
+                             <div class="chart-container h-96">
+                                <canvas id="experienceChart"></canvas>
+                             </div>
+                        </div>
+                        <div class="card p-6 mt-8 text-center bg-[#073B4C] text-white">
+                            <p class="text-lg">Cần ít nhất</p>
+                            <p class="text-6xl font-extrabold my-2">5+</p>
+                            <p class="text-lg">năm kinh nghiệm và <span class="font-bold text-[#FFD166]">giấy phép hành nghề</span> để đạt vị trí Senior Architect.</p>
+                        </div>
+                    </div>
+                     <div class="md:col-span-3">
+                         <div class="relative">
+                            <div class="timeline-item relative pl-8 pb-8">
+                                <div class="timeline-dot"></div>
+                                <h4 class="font-bold text-xl">Thực Tập Sinh (Intern)</h4>
+                                <p class="text-sm text-gray-600">Hỗ trợ vẽ, làm mô hình, học hỏi quy trình làm việc thực tế.</p>
+                            </div>
+                             <div class="timeline-item relative pl-8 pb-8">
+                                <div class="timeline-dot"></div>
+                                <h4 class="font-bold text-xl">Kiến Trúc Sư Trẻ (Junior)</h4>
+                                <p class="text-sm text-gray-600">0-2 năm KN. Tham gia thiết kế, phát triển dự án dưới sự hướng dẫn.</p>
+                            </div>
+                            <div class="timeline-item relative pl-8 pb-8">
+                                <div class="timeline-dot"></div>
+                                <h4 class="font-bold text-xl">Kiến Trúc Sư (Architect)</h4>
+                                <p class="text-sm text-gray-600">2-5 năm KN. Lên ý tưởng, làm việc với khách hàng, giám sát thi công.</p>
+                            </div>
+                            <div class="timeline-item relative pl-8 pb-8">
+                                <div class="timeline-dot"></div>
+                                <h4 class="font-bold text-xl">Kiến Trúc Sư Cấp Cao (Senior)</h4>
+                                <p class="text-sm text-gray-600">5+ năm KN. Lãnh đạo dự án, quản lý đội nhóm, tư vấn khách hàng.</p>
+                            </div>
+                             <div class="timeline-item relative pl-8 pb-8">
+                                <div class="timeline-dot"></div>
+                                <h4 class="font-bold text-xl">Quản lý/Trưởng phòng</h4>
+                                <p class="text-sm text-gray-600">5-10 năm KN. Quản lý bộ phận thiết kế, lập kế hoạch, ngân sách.</p>
+                            </div>
+                             <div class="timeline-item relative pl-8">
+                                <div class="timeline-dot"></div>
+                                <h4 class="font-bold text-xl">Giám đốc/Đối tác (Director/Partner)</h4>
+                                <p class="text-sm text-gray-600">10+ năm KN. Điều hành công ty, đưa ra quyết định chiến lược, phát triển kinh doanh.</p>
+                            </div>
+                         </div>
+                    </div>
+                 </div>
+            </section>
+            
+            <section id="conclusion">
+                 <h2 class="text-3xl font-bold text-center mb-8">Hành Trình của Bạn Bắt Đầu Từ Đây</h2>
+                 <p class="text-center max-w-3xl mx-auto mb-12">Con đường trở thành kiến trúc sư chuyên nghiệp đòi hỏi sự kiên trì, học hỏi không ngừng và đam mê sáng tạo. Hãy bắt đầu xây dựng nền tảng vững chắc và từng bước chinh phục các kỹ năng mới.</p>
+            </section>
+        </main>
+
+        <footer class="text-center py-8 mt-12 border-t border-gray-200">
+            <p class="text-sm text-gray-500">Infographic được tạo dựa trên báo cáo phân tích lộ trình phát triển kỹ năng ngành kiến trúc.</p>
+        </footer>
+    </div>
+
+    <script>
+        const wrapLabel = (label) => {
+            const maxLen = 16;
+            if (label.length <= maxLen) return label;
+            const words = label.split(' ');
+            let lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + ' ' + word).trim().length > maxLen) {
+                    lines.push(currentLine.trim());
+                    currentLine = word;
+                } else {
+                    currentLine = (currentLine + ' ' + word).trim();
+                }
+            }
+            if (currentLine) lines.push(currentLine.trim());
+            return lines;
+        };
+
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+              return label.join(' ');
+            } else {
+              return label;
+            }
+        };
+
+        const drawingChartData = {
+            labels: ['Khối Cơ Bản', 'Tĩnh Vật', 'Tượng Cơ Bản', 'Tượng Chuyên Sâu'],
+            durations: [3, 2, 2, 3]
+        };
+
+        const experienceChartData = {
+            labels: ['Junior Architect', 'Architect', 'Senior Architect', 'Design Manager', ['Director /', 'Partner']].map(wrapLabel),
+            experience: [2, 5, 5, 10, 10]
+        };
+        
+        const palette = {
+            red: '#FF6B6B',
+            yellow: '#FFD166',
+            green: '#06D6A0',
+            blue: '#118AB2',
+            darkBlue: '#073B4C'
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const drawingCtx = document.getElementById('drawingChart').getContext('2d');
+            new Chart(drawingCtx, {
+                type: 'bar',
+                data: {
+                    labels: drawingChartData.labels,
+                    datasets: [{
+                        label: 'Thời gian học (tháng)',
+                        data: drawingChartData.durations,
+                        backgroundColor: [palette.red, palette.yellow, palette.green, palette.blue],
+                        borderColor: 'white',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: palette.darkBlue,
+                            titleFont: { size: 14, weight: 'bold' },
+                            bodyFont: { size: 12 },
+                            padding: 10,
+                            cornerRadius: 5,
+                            callbacks: {
+                                title: tooltipTitleCallback,
+                                label: context => `${context.dataset.label}: ${context.raw} tháng`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            beginAtZero: true, 
+                            grid: { display: false },
+                            ticks: { font: { family: "'Be Vietnam Pro', sans-serif" } },
+                            title: { display: true, text: 'Số tháng' }
+                        },
+                        y: { 
+                            grid: { display: false },
+                            ticks: { font: { family: "'Be Vietnam Pro', sans-serif", size: 14 } }
+                        }
+                    }
+                }
+            });
+
+            const experienceCtx = document.getElementById('experienceChart').getContext('2d');
+            new Chart(experienceCtx, {
+                type: 'bar',
+                data: {
+                    labels: experienceChartData.labels,
+                    datasets: [{
+                        label: 'Số năm kinh nghiệm tối thiểu',
+                        data: experienceChartData.experience,
+                        backgroundColor: [palette.red, palette.yellow, palette.green, palette.blue, palette.darkBlue],
+                        borderColor: 'white',
+                        borderWidth: 2,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: palette.darkBlue,
+                            titleFont: { size: 14, weight: 'bold' },
+                            bodyFont: { size: 12 },
+                            padding: 10,
+                            cornerRadius: 5,
+                            callbacks: {
+                                title: tooltipTitleCallback,
+                                label: context => `${context.dataset.label}: ${context.raw}+ năm`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { color: '#eef2f9' },
+                            ticks: { font: { family: "'Be Vietnam Pro', sans-serif" } },
+                            title: { display: true, text: 'Số năm kinh nghiệm' }
+                        },
+                        x: { 
+                            grid: { display: false },
+                            ticks: { font: { family: "'Be Vietnam Pro', sans-serif", size: 12 } }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

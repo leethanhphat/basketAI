@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lộ Trình Phát Triển Kỹ Năng Kiến Trúc</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: Tôi đã thiết kế một ứng dụng một trang (SPA) với thanh điều hướng cố định bên cạnh để truy cập nhanh các giai đoạn chính. Cấu trúc này chuyển đổi báo cáo tuyến tính thành một trải nghiệm khám phá, nơi người dùng có thể tự do chuyển đổi giữa các phần như Nền tảng, Kỹ năng Số, Diễn họa Chuyên sâu, và Lộ trình Sự nghiệp. Mỗi phần sử dụng các thành phần tương tác như biểu đồ, thẻ có thể mở rộng, và dòng thời gian để trình bày thông tin một cách trực quan và dễ tiếp thu, thay vì các bảng và văn bản dài. Lý do chọn cấu trúc này là để tăng cường sự tương tác của người dùng và làm cho thông tin phức tạp trở nên dễ hiểu hơn, phù hợp với đối tượng là các kiến trúc sư và sinh viên đang tìm kiếm một lộ trình học tập rõ ràng. -->
+    <!-- Visualization & Content Choices: 
+    - Giới thiệu: Thẻ chào mừng với tổng quan.
+    - Giai đoạn 1 (Nền tảng): Biểu đồ thanh ngang (Chart.js) để trực quan hóa thời gian học vẽ (~tháng), giúp người dùng nhanh chóng nắm bắt được khối lượng thời gian cần thiết. Các thẻ thông tin cho từng kỹ năng. Mục tiêu: Thông báo.
+    - Giai đoạn 2 & 3 (Kỹ năng số & Diễn họa): Lưới các thẻ tương tác cho mỗi phần mềm. Khi nhấp vào, thẻ sẽ mở rộng để hiển thị thông tin chi tiết, so sánh và lộ trình học. Cách này tốt hơn bảng tĩnh vì nó gọn gàng và tập trung vào lựa chọn của người dùng. Mục tiêu: So sánh, Tổ chức.
+    - Giai đoạn 4 (Sự nghiệp): Dòng thời gian dọc tương tác (HTML/CSS) để thể hiện các nấc thang sự nghiệp. Nhấp vào mỗi vị trí sẽ hiển thị chi tiết trách nhiệm và kỹ năng. Một biểu đồ thanh (Chart.js) sẽ so sánh số năm kinh nghiệm yêu cầu. Đây là cách trình bày hấp dẫn hơn nhiều so với một bảng lớn. Mục tiêu: Hiển thị sự thay đổi/tiến triển.
+    - Tài nguyên: Danh sách được phân loại rõ ràng để dễ dàng tham khảo. Mục tiêu: Tổ chức.
+    Tất cả các lựa chọn này đều nhằm mục đích biến dữ liệu tĩnh thành một câu chuyện tương tác, sử dụng Chart.js và Vanilla JS, tuân thủ yêu cầu không dùng SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #F8F7F4;
+            color: #4a4a4a;
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        .nav-link.active {
+            background-color: #EAE7E0;
+            color: #A35741;
+            border-left-color: #A35741;
+        }
+        .nav-link:hover {
+            background-color: #EAE7E0;
+            color: #A35741;
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #A35741;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 1.25rem;
+            width: 4px;
+            background-color: #EAE7E0;
+            border-radius: 2px;
+        }
+        .timeline-item .dot {
+            position: absolute;
+            left: 0.625rem;
+            top: 0.5rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 50%;
+            background-color: #FFFFFF;
+            border: 4px solid #A35741;
+            transition: all 0.3s ease;
+        }
+        .timeline-item:hover .dot {
+            transform: scale(1.2);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px; 
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+    <aside class="w-64 bg-white flex-shrink-0 p-4 border-r border-gray-200 overflow-y-auto">
+        <h1 class="text-2xl font-bold text-[#A35741] mb-8">Lộ Trình Kiến Trúc</h1>
+        <nav class="space-y-2" id="mainNav">
+            <a href="#intro" class="nav-link active flex items-center p-3 rounded-lg">
+                <span class="mr-3">👋</span> Giới thiệu
+            </a>
+            <a href="#stage1" class="nav-link flex items-center p-3 rounded-lg">
+                <span class="mr-3">✍️</span> Nền tảng Truyền thống
+            </a>
+            <a href="#stage2" class="nav-link flex items-center p-3 rounded-lg">
+                <span class="mr-3">💻</span> Kỹ năng Số 2D/3D
+            </a>
+            <a href="#stage3" class="nav-link flex items-center p-3 rounded-lg">
+                <span class="mr-3">🎨</span> Diễn họa Chuyên sâu
+            </a>
+            <a href="#stage4" class="nav-link flex items-center p-3 rounded-lg">
+                <span class="mr-3">🚀</span> Lộ trình Sự nghiệp
+            </a>
+            <a href="#resources" class="nav-link flex items-center p-3 rounded-lg">
+                <span class="mr-3">📚</span> Tài nguyên
+            </a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-6 md:p-10">
+        <div id="intro" class="content-section active">
+            <h2 class="text-4xl font-bold mb-4">Con Đường Trở Thành Kiến Trúc Sư Diễn Họa</h2>
+            <p class="text-lg mb-6 max-w-3xl">Chào mừng bạn đến với lộ trình phát triển kỹ năng kiến trúc, một bản đồ chi tiết được thiết kế để dẫn lối từ những nét vẽ cơ bản đến việc làm chủ các công cụ số phức tạp và thăng tiến trong sự nghiệp. Khác với các lộ trình công nghệ như roadmap.sh, con đường của kiến trúc sư đòi hỏi sự hòa quyện giữa nghệ thuật, kỹ thuật và tư duy không gian. Ứng dụng này sẽ giúp bạn khám phá từng giai đoạn một cách trực quan và tương tác.</p>
+            <div class="card p-6">
+                <h3 class="font-bold text-xl mb-2 text-[#A35741]">Kiến Trúc vs. Công nghệ: Một Lộ Trình Đa Diện</h3>
+                <p>Nếu roadmap.sh chia nhỏ các kỹ năng công nghệ thành những nhánh riêng biệt, thì lộ trình kiến trúc lại là một hệ sinh thái tích hợp. Kỹ năng vẽ tay là nền tảng cho tư duy thẩm mỹ, làm tiền đề cho việc sử dụng phần mềm 3D. Các phần mềm không chỉ là công cụ đơn lẻ mà là một phần của quy trình làm việc (workflow) liền mạch, từ ý tưởng, triển khai kỹ thuật, diễn họa đến quản lý dự án BIM. Hãy bắt đầu hành trình khám phá lộ trình đa diện và đầy sáng tạo này.</p>
+            </div>
+        </div>
+
+        <div id="stage1" class="content-section">
+            <h2 class="text-4xl font-bold mb-2">Giai Đoạn 1: Nền Tảng Kỹ Năng Vẽ Truyền Thống</h2>
+            <p class="text-lg mb-6 max-w-3xl">Đây là bước khởi đầu quan trọng nhất, nơi bạn xây dựng nền tảng về tư duy thị giác, thẩm mỹ và khả năng phân tích không gian ba chiều. Việc nắm vững kỹ năng vẽ tay, đặc biệt là hình họa chì, là chìa khóa để "suy nghĩ bằng hình ảnh" và là tiền đề cho mọi kỹ năng số sau này.</p>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="card p-6">
+                     <h3 class="font-bold text-xl mb-4 text-[#A35741]">Lộ trình học vẽ Hình họa Chì</h3>
+                     <p class="mb-4">Biểu đồ dưới đây thể hiện thời gian ước tính để hoàn thành từng phần trong quá trình học vẽ hình họa cơ bản, một yêu cầu tiên quyết cho các kỳ thi tuyển sinh vào ngành kiến trúc.</p>
+                     <div class="chart-container h-80 md:h-96">
+                        <canvas id="drawingChart"></canvas>
+                     </div>
+                </div>
+                <div class="space-y-4">
+                     <div class="card p-4">
+                        <h4 class="font-semibold text-lg">Phác thảo ý tưởng (Sketching)</h4>
+                        <p class="text-sm">Là ngôn ngữ trực quan của ý tưởng, giúp nhanh chóng ghi lại, phát triển và truyền đạt khái niệm thiết kế mà không bị giới hạn bởi sự phức tạp của phần mềm.</p>
+                    </div>
+                     <div class="card p-4">
+                        <h4 class="font-semibold text-lg">Tư duy Thẩm mỹ & Sáng tạo</h4>
+                        <p class="text-sm">Không chỉ là kỹ năng, đây là yếu tố cốt lõi giúp tạo ra những công trình độc đáo. Nó được rèn luyện qua thực hành, nghiên cứu và phân tích nghệ thuật, kiến trúc.</p>
+                    </div>
+                    <div class="card p-4">
+                        <h4 class="font-semibold text-lg">Sơ đồ (Diagrams) & Minh họa (Illustrations)</h4>
+                        <p class="text-sm">Công cụ mạnh mẽ để giải thích các quy trình phức tạp, kể một câu chuyện về thiết kế, và truyền đạt không khí, trải nghiệm của không gian đến người xem.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="stage2" class="content-section">
+            <h2 class="text-4xl font-bold mb-2">Giai Đoạn 2: Chuyển Đổi Số - Kỹ Năng Vẽ Kỹ Thuật và Mô Hình 2D/3D</h2>
+            <p class="text-lg mb-6 max-w-3xl">Trong kỷ nguyên số, việc thành thạo phần mềm là yêu cầu bắt buộc. Giai đoạn này tập trung vào các công cụ nền tảng giúp bạn chuyển ý tưởng từ phác thảo thành các bản vẽ kỹ thuật chính xác và mô hình 3D chi tiết. Hãy khám phá vai trò của từng phần mềm trong hệ sinh thái thiết kế tích hợp.</p>
+            <div id="software-tabs-2d" class="software-container"></div>
+        </div>
+
+        <div id="stage3" class="content-section">
+            <h2 class="text-4xl font-bold mb-2">Giai Đoạn 3: Diễn Họa Kiến Trúc Chuyên Sâu</h2>
+            <p class="text-lg mb-6 max-w-3xl">Giai đoạn này là nơi các mô hình kỹ thuật được "thổi hồn", trở thành những hình ảnh và video sống động, đầy cảm xúc. Kỹ năng diễn họa chuyên sâu không chỉ là việc làm chủ công nghệ mà còn là nghệ thuật kể chuyện bằng hình ảnh, ánh sáng và vật liệu để thuyết phục khách hàng.</p>
+            <div id="software-tabs-3d" class="software-container"></div>
+        </div>
+
+        <div id="stage4" class="content-section">
+            <h2 class="text-4xl font-bold mb-2">Giai Đoạn 4: Phát Triển Sự Nghiệp</h2>
+            <p class="text-lg mb-6 max-w-3xl">Kỹ năng chuyên môn là nền tảng, nhưng để tiến xa, bạn cần có một lộ trình sự nghiệp rõ ràng, tích lũy kinh nghiệm và trau dồi kỹ năng mềm. Hãy khám phá các nấc thang sự nghiệp trong ngành kiến trúc, từ một thực tập sinh đến vị trí giám đốc, và các kỹ năng cần thiết cho mỗi vai trò.</p>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="md:col-span-1">
+                    <h3 class="font-bold text-xl mb-4 text-[#A35741]">Lộ trình thăng tiến</h3>
+                     <div id="career-timeline" class="relative"></div>
+                </div>
+                <div class="md:col-span-2">
+                    <div id="career-details" class="card p-6 sticky top-6"></div>
+                    <div class="card p-6 mt-8">
+                        <h3 class="font-bold text-xl mb-4 text-[#A35741]">Kinh nghiệm yêu cầu theo vị trí</h3>
+                        <div class="chart-container h-80 md:h-96">
+                           <canvas id="experienceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="resources" class="content-section">
+            <h2 class="text-4xl font-bold mb-2">Tài Nguyên Học Tập và Cộng Đồng</h2>
+            <p class="text-lg mb-6 max-w-3xl">Hành trình của bạn sẽ không đơn độc. Có rất nhiều khóa học, trung tâm đào tạo và cộng đồng trực tuyến sẵn sàng hỗ trợ bạn. Dưới đây là danh sách các tài nguyên uy tín để bạn tham khảo và kết nối.</p>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="resource-list"></div>
+        </div>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mainNav = document.getElementById('mainNav');
+            const navLinks = mainNav.querySelectorAll('a');
+            const contentSections = document.querySelectorAll('.content-section');
+            let drawingChartInstance, experienceChartInstance;
+
+            const data = {
+                drawingSkills: {
+                    labels: ['Tượng Chuyên Sâu', 'Tượng Cơ Bản', 'Tĩnh Vật', 'Khối Cơ Bản'],
+                    durations: [3, 2, 2, 3],
+                },
+                software2D: [
+                    { id: 'autocad', name: 'AutoCAD', icon: '📐', purpose: 'Vẽ kỹ thuật 2D chính xác, triển khai bản vẽ thi công.', pros: 'Độ chính xác cao, tiêu chuẩn hóa, phổ biến.', learning: 'Giao diện, lệnh tắt, vẽ/hiệu chỉnh 2D, Text, Dim, Hatch, Block, Layer.' },
+                    { id: 'revit', name: 'Revit (BIM)', icon: '🏗️', purpose: 'Mô hình hóa thông tin công trình (BIM), thiết kế tích hợp.', pros: 'Quản lý dữ liệu tập trung, tối ưu hóa cộng tác, giảm lỗi.', learning: 'Giao diện, Project, Family, tạo tường, sàn, cửa, hệ MEP cơ bản.' },
+                    { id: 'sketchup', name: 'SketchUp', icon: '🏠', purpose: 'Diễn họa ý tưởng nhanh, mô hình 3D sơ bộ.', pros: 'Dễ học, tốc độ dựng hình nhanh, nhiều plugin hỗ trợ.', learning: 'Giao diện, công cụ vẽ/hiệu chỉnh cơ bản (Line, Push/Pull), nhóm, lớp.' },
+                    { id: 'rhino', name: 'Rhino', icon: '🌀', purpose: 'Thiết kế hình học phức tạp, bề mặt cong, thiết kế sản phẩm.', pros: 'Mạnh mẽ trong tạo hình phi tuyến tính, tự do sáng tạo.', learning: 'Giao diện, quản lý Layer, vẽ 2D, tạo khối 3D, xử lý bề mặt phức tạp.' }
+                ],
+                software3D: [
+                    { id: '3dsmax', name: '3ds Max', icon: '🎲', purpose: 'Dựng hình 3D chi tiết, mô hình phức tạp cho kiến trúc, nội thất.', pros: 'Khả năng dựng hình mạnh mẽ, linh hoạt, thư viện plugin phong phú.', learning: 'Giao diện, lệnh dựng hình, Modifier, vật liệu, ánh sáng, camera.' },
+                    { id: 'vray', name: 'V-Ray / Corona', icon: '💡', purpose: 'Kết xuất (render) hình ảnh kiến trúc chất lượng cao, chân thực.', pros: 'Chất lượng ảnh sống động, ánh sáng và vật liệu thực tế.', learning: 'Cài đặt render, vật liệu, ánh sáng (Sun, Sky, HDRI), camera.' },
+                    { id: 'lumion', name: 'Lumion', icon: '🎬', purpose: 'Diễn họa kiến trúc nhanh, làm phim kiến trúc, cảnh quan.', pros: 'Tốc độ render cực nhanh, thư viện lớn, dễ sử dụng.', learning: 'Giao diện, vật liệu, tạo địa hình, đặt đối tượng, hiệu ứng, render ảnh/video.' },
+                    { id: 'photoshop', name: 'Photoshop', icon: '🖌️', purpose: 'Hậu kỳ ảnh render, chỉnh sửa màu sắc, ánh sáng, hoàn thiện bản vẽ.', pros: 'Công cụ chỉnh sửa mạnh mẽ, tạo hiệu ứng nghệ thuật.', learning: 'Xử lý màu, độ tương phản, thêm người/cây cối, ghép ảnh.' }
+                ],
+                careerPath: [
+                    { level: 'Thực tập sinh', exp: '0', hard: 'AutoCAD, SketchUp cơ bản.', soft: 'Học hỏi, tuân thủ.', desc: 'Hỗ trợ vẽ, làm mô hình, nghiên cứu dự án.' },
+                    { level: 'Junior Architect', exp: '0-2', hard: 'Thành thạo phần mềm thiết kế.', soft: 'Làm việc nhóm, giao tiếp cơ bản.', desc: 'Tham gia thiết kế, phát triển dự án dưới sự hướng dẫn.' },
+                    { level: 'Architect / Designer', exp: '2-5', hard: 'Revit, 3ds Max, V-Ray.', soft: 'Giao tiếp, giải quyết vấn đề.', desc: 'Lên ý tưởng, thiết kế, làm việc với khách hàng, giám sát.' },
+                    { level: 'Senior Architect', exp: '5+', hard: 'Giấy phép hành nghề, chuyên môn sâu.', soft: 'Lãnh đạo, quản lý đội nhóm, đàm phán.', desc: 'Lãnh đạo dự án, quản lý đội ngũ, tư vấn khách hàng.' },
+                    { level: 'Project Architect', exp: '5+', hard: 'Giấy phép hành nghề, QLDA.', soft: 'Lãnh đạo mạnh mẽ, giao tiếp xuất sắc.', desc: 'Quản lý toàn bộ dự án, điều phối các bên liên quan.' },
+                    { level: 'Design Manager', exp: '5-10', hard: 'Kinh nghiệm quản lý, kiến thức pháp luật.', soft: 'Lãnh đạo, tuyển dụng, ra quyết định.', desc: 'Quản lý bộ phận thiết kế, lập kế hoạch, ngân sách.' },
+                    { level: 'Director / Partner', exp: '10+', hard: 'Tầm nhìn kinh doanh, quản lý cấp cao.', soft: 'Lãnh đạo chiến lược, phát triển kinh doanh.', desc: 'Điều hành công ty, đưa ra quyết định chiến lược.' }
+                ],
+                resources: [
+                    { category: 'Đào tạo', name: 'Đại học Kiến trúc Hà Nội', desc: 'Chương trình đào tạo chính quy hàng đầu Việt Nam.', link: '#' },
+                    { category: 'Đào tạo', name: 'Zest Art / Art Land', desc: 'Trung tâm chuyên luyện thi vẽ khối V.', link: '#' },
+                    { category: 'Đào tạo', name: 'Revit Việt Nam', desc: 'Các khóa học Revit từ cơ bản đến quản lý BIM.', link: '#' },
+                    { category: 'Đào tạo', name: 'IDC / NESA Groups', desc: 'Đào tạo chuyên sâu 3ds Max, V-Ray, Lumion.', link: '#' },
+                    { category: 'Cộng đồng', name: 'ArchDaily / Dezeen', desc: 'Tạp chí kiến trúc, cập nhật xu hướng và dự án toàn cầu.', link: '#' },
+                    { category: 'Cộng đồng', name: 'Cadviet.com', desc: 'Diễn đàn lớn cho cộng đồng thiết kế, xây dựng Việt Nam.', link: '#' },
+                    { category: 'Cộng đồng', name: 'CGarchitect Forums', desc: 'Diễn đàn quốc tế chuyên về diễn họa kiến trúc.', link: '#' },
+                    { category: 'Quốc tế', name: 'edX / Coursera', desc: 'Các khóa học từ các đại học hàng đầu thế giới.', link: '#' }
+                ]
+            };
+
+            function navigateTo(hash) {
+                if (!hash) hash = '#intro';
+
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href') === hash) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+
+                contentSections.forEach(section => {
+                    if ('#' + section.id === hash) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                
+                // Lazy load charts
+                if (hash === '#stage1' && !drawingChartInstance) initDrawingChart();
+                if (hash === '#stage4' && !experienceChartInstance) initExperienceChart();
+            }
+
+            mainNav.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A' || e.target.closest('a')) {
+                    e.preventDefault();
+                    const link = e.target.closest('a');
+                    const hash = link.getAttribute('href');
+                    window.location.hash = hash;
+                }
+            });
+            
+            window.addEventListener('hashchange', () => navigateTo(window.location.hash));
+
+            function initDrawingChart() {
+                const ctx = document.getElementById('drawingChart').getContext('2d');
+                drawingChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.drawingSkills.labels,
+                        datasets: [{
+                            label: 'Thời gian học (tháng)',
+                            data: data.drawingSkills.durations,
+                            backgroundColor: '#A35741',
+                            borderColor: '#8C432E',
+                            borderWidth: 1,
+                            borderRadius: 5,
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${context.raw} tháng`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Số tháng'
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function createSoftwareTabs(containerId, softwareData) {
+                const container = document.getElementById(containerId);
+                let html = '<div class="flex flex-wrap gap-2 mb-6">';
+                softwareData.forEach((sw, index) => {
+                    html += `<button class="tab-button text-sm md:text-base px-4 py-2 rounded-full ${index === 0 ? 'active' : 'bg-white'}" data-tab="${containerId}-${sw.id}">${sw.icon} ${sw.name}</button>`;
+                });
+                html += '</div>';
+
+                softwareData.forEach((sw, index) => {
+                    html += `
+                        <div id="${containerId}-${sw.id}" class="tab-content card p-6 ${index === 0 ? 'active' : ''}">
+                            <h3 class="font-bold text-2xl mb-2 text-[#A35741]">${sw.name}</h3>
+                            <p class="text-md mb-4 italic">${sw.purpose}</p>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div><h4 class="font-semibold">Ưu điểm:</h4><p>${sw.pros}</p></div>
+                                <div><h4 class="font-semibold">Lộ trình học cơ bản:</h4><p>${sw.learning}</p></div>
+                            </div>
+                        </div>`;
+                });
+                container.innerHTML = html;
+            }
+
+            function setupTabEvents(containerId) {
+                const container = document.getElementById(containerId);
+                container.addEventListener('click', e => {
+                    if (e.target.classList.contains('tab-button')) {
+                        const tabId = e.target.dataset.tab;
+                        container.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active', 'bg-white'));
+                        e.target.classList.add('active');
+
+                        container.querySelectorAll('.tab-content').forEach(content => {
+                            if (content.id === tabId) {
+                                content.classList.add('active');
+                            } else {
+                                content.classList.remove('active');
+                            }
+                        });
+                    }
+                });
+            }
+            
+            function populateCareerTimeline() {
+                const timelineContainer = document.getElementById('career-timeline');
+                let html = '';
+                data.careerPath.forEach((item, index) => {
+                    html += `
+                    <div class="timeline-item relative pl-10 pb-8 cursor-pointer" data-index="${index}">
+                        <div class="dot"></div>
+                        <p class="text-gray-500 text-sm">${item.exp} năm kinh nghiệm</p>
+                        <h4 class="font-semibold text-lg">${item.level}</h4>
+                    </div>
+                    `;
+                });
+                timelineContainer.innerHTML = html;
+
+                timelineContainer.addEventListener('click', e => {
+                    const item = e.target.closest('.timeline-item');
+                    if (item) {
+                        const index = item.dataset.index;
+                        updateCareerDetails(index);
+                    }
+                });
+                
+                updateCareerDetails(0); 
+            }
+
+            function updateCareerDetails(index) {
+                const detailsContainer = document.getElementById('career-details');
+                const item = data.careerPath[index];
+                detailsContainer.innerHTML = `
+                    <h3 class="font-bold text-2xl mb-2 text-[#A35741]">${item.level}</h3>
+                    <p class="mb-4">${item.desc}</p>
+                    <div class="space-y-3">
+                        <div>
+                            <h4 class="font-semibold">Kỹ năng cứng yêu cầu:</h4>
+                            <p class="text-sm">${item.hard}</p>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Kỹ năng mềm yêu cầu:</h4>
+                            <p class="text-sm">${item.soft}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function initExperienceChart() {
+                const ctx = document.getElementById('experienceChart').getContext('2d');
+                const labels = data.careerPath.map(item => item.level);
+                const expData = data.careerPath.map(item => {
+                    const parts = item.exp.replace('+', '').split('-');
+                    return parts.length > 1 ? parseInt(parts[1]) : parseInt(parts[0]);
+                });
+
+                experienceChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Số năm kinh nghiệm tối thiểu/trung bình (năm)',
+                            data: expData,
+                            backgroundColor: '#C59C82',
+                            borderColor: '#A35741',
+                            borderWidth: 1,
+                            borderRadius: 5,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                           legend: {
+                                display: false
+                            },
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Số năm kinh nghiệm'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    autoSkip: false,
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            function populateResources() {
+                const container = document.getElementById('resource-list');
+                let html = '';
+                data.resources.forEach(res => {
+                    html += `
+                    <a href="${res.link}" target="_blank" class="card block p-4 hover:border-[#A35741] border-transparent border">
+                        <span class="inline-block bg-gray-200 text-gray-700 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">${res.category}</span>
+                        <h4 class="font-semibold mt-2">${res.name}</h4>
+                        <p class="text-sm text-gray-600">${res.desc}</p>
+                    </a>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+
+            createSoftwareTabs('software-tabs-2d', data.software2D);
+            setupTabEvents('software-tabs-2d');
+            createSoftwareTabs('software-tabs-3d', data.software3D);
+            setupTabEvents('software-tabs-3d');
+            populateCareerTimeline();
+            populateResources();
+            
+            navigateTo(window.location.hash);
+        });
+    </script>
+</body>
+</html>
